@@ -1,0 +1,42 @@
+name: vocab
+
+services:
+
+  auth:
+    container_name: auth
+    image: quay.io/keycloak/keycloak:25.0.2
+    environment:
+      - KC_DB=${KC_DB}
+      - KC_DB_USERNAME=${KC_DB_USERNAME}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
+      - KC_DB_URL=${KC_DB_URL}
+      - KC_PROXY_HEADERS=${KC_PROXY_HEADERS}
+      - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
+      - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+    networks:
+      vocab_net:
+        ipv4_address: 172.18.0.4
+    ports:
+      - "8080:8080"
+    command: [ "start" ]
+  # #
+  # backend:
+  #   networks:
+  #     vocab_net:
+  #       ipv4_address: 172.18.0.2
+  #   depends_on:
+  #     - auth
+  # #    
+  # frontend:
+  #   networks:
+  #     vocab_net:
+  #       ipv4_address: 172.18.0.3
+  #   depends_on:
+  #     - backend
+  #     - auth
+
+networks:
+  vocab_net:
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
