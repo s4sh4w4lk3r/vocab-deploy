@@ -19,14 +19,26 @@ services:
     ports:
       - "8080:8080"
     command: [ "start" ]
-  # #
-  # backend:
-  #   networks:
-  #     vocab_net:
-  #       ipv4_address: 172.18.0.2
-  #   depends_on:
-  #     - auth
-  # #    
+# ---------------------------------------------
+  backend:
+    image: backend
+    build: ../vocab-server/
+    environment:
+      - ConnectionStrings__PostgreSql=${BACKEND_POSTGRES_CONN_STRING}
+      - ConnectionStrings__HangfireConnection=${BACKEND_HANGFIRE_DB_CONN_STRING}
+      - Keycloak__auth-server-url=${BACKEND_KC_URL}
+      - Keycloak__realm=${BACKEND_KC_REALM}
+      - Keycloak__resource=${BACKEND_KC_CLIENT_ID}
+      - Keycloak__credentials__secret=${BACKEND_KC_CLIENT_SECRET}
+      - Cors__Origins=${BACKEND_CORS_ORIGINS}
+    networks:
+      vocab_net:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth
+# ---------------------------------------------
   # frontend:
   #   networks:
   #     vocab_net:
