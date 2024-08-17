@@ -10,9 +10,9 @@ services:
       - KC_DB_USERNAME=${KC_DB_USERNAME}
       - KC_DB_PASSWORD=${KC_DB_PASSWORD}
       - KC_DB_URL=${KC_DB_URL}
-      - KC_PROXY_HEADERS=${KC_PROXY_HEADERS}
-      - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
-      - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
     networks:
       vocab_net:
         ipv4_address: 172.18.0.4
