@@ -3,7 +3,7 @@ name: vocab
 services:
 
   auth:
-    container_name: auth
+    container_name: vocab-auth
     image: quay.io/keycloak/keycloak:25.0.2
     environment:
       - KC_DB=${KC_DB}
@@ -18,9 +18,15 @@ services:
         ipv4_address: 172.18.0.4
     ports:
       - "8080:8080"
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r host: http://localhost\r Connection: close\r \r ' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;" ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     command: [ "start" ]
-# ---------------------------------------------
+  # ---------------------------------------------
   backend:
+    container_name: vocab-backend
     image: backend
     build: ../vocab-server/
     environment:
@@ -37,15 +43,16 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - auth
-# ---------------------------------------------
+      auth:
+        condition: service_healthy
+  # ---------------------------------------------
   # frontend:
   #   networks:
   #     vocab_net:
   #       ipv4_address: 172.18.0.3
   #   depends_on:
-  #     - backend
-  #     - auth
+  #     backend
+  #     auth
 
 networks:
   vocab_net:
