@@ -27,7 +27,6 @@ services:
   # ---------------------------------------------
   backend:
     container_name: vocab-backend
-    image: backend
     build: ../vocab-server/
     environment:
       - ConnectionStrings__PostgreSql=${BACKEND_POSTGRES_CONN_STRING}
@@ -41,18 +40,21 @@ services:
       vocab_net:
         ipv4_address: 172.18.0.2
     ports:
-      - "5000:5000"
+      - "5000:8080"
     depends_on:
       auth:
         condition: service_healthy
   # ---------------------------------------------
   # frontend:
+  #   container_name: vocab-frontend
+  #   build: ../vocab-client/
   #   networks:
   #     vocab_net:
   #       ipv4_address: 172.18.0.3
+  #   ports: -"5000:3000"
   #   depends_on:
-  #     backend
-  #     auth
+  #     backend:
+  #       condition: service_healthy
 
 networks:
   vocab_net:
