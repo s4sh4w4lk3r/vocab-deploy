@@ -4,9 +4,9 @@ services:
 
   auth:
     container_name: vocab-auth
-    image: quay.io/keycloak/keycloak:25.0.2
+    build:
+      dockerfile: ./keycloak.Dockerfile
     environment:
-      - KC_DB=postgres
       - KC_DB_USERNAME=${KC_DB_USERNAME}
       - KC_DB_PASSWORD=${KC_DB_PASSWORD}
       - KC_DB_URL=${KC_DB_URL}
@@ -23,8 +23,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
-    command: [ "start" ]
-  # ---------------------------------------------
+    command: [ "start", "--optimized" ]
+    # ---------------------------------------------
+
   backend:
     container_name: vocab-backend
     build: ../vocab-server/
@@ -36,8 +37,8 @@ services:
       - Keycloak__resource=${BACKEND_KC_CLIENT_ID}
       - Keycloak__credentials__secret=${BACKEND_KC_CLIENT_SECRET}
       - Cors__Origins=${BACKEND_CORS_ORIGINS}
-    volumes:
-      - backend_vol:/app/logs:rw
+    # volumes:
+    #   - backend_vol:/app/logs:rw
     networks:
       vocab_net:
         ipv4_address: 172.18.0.2
@@ -46,17 +47,18 @@ services:
     depends_on:
       auth:
         condition: service_healthy
-  # ---------------------------------------------
-  # frontend:
-  #   container_name: vocab-frontend
-  #   build: ../vocab-client/
-  #   networks:
-  #     vocab_net:
-  #       ipv4_address: 172.18.0.3
-  #   ports: -"5000:3000"
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
+    # ---------------------------------------------
+
+    # frontend:
+    #   container_name: vocab-frontend
+    #   build: ../vocab-client/
+    #   networks:
+    #     vocab_net:
+    #       ipv4_address: 172.18.0.3
+    #   ports: -"5000:3000"
+    #   depends_on:
+    #     backend:
+    #       condition: service_healthy
 
 networks:
   vocab_net:
@@ -64,5 +66,5 @@ networks:
       config:
         - subnet: 172.18.0.0/16
 
-volumes:
-  backend_vol:
+# volumes:
+#   backend_vol:
