@@ -38,6 +38,7 @@ services:
       - Keycloak__resource=${BACKEND_KC_CLIENT_ID}
       - Keycloak__credentials__secret=${BACKEND_KC_CLIENT_SECRET}
       - Cors__Origins=${BACKEND_CORS_ORIGINS}
+      - Auth__ValidIssuers=${BACKEND_AUTH_VALID_ISSUERS}
     # volumes:
     #   - backend_vol:/app/logs:rw
     networks:
