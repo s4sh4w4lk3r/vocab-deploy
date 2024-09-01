@@ -2,31 +2,6 @@ name: vocab
 
 services:
 
-  auth:
-    container_name: vocab-auth
-    build:
-      dockerfile: ./keycloak.Dockerfile
-    environment:
-      - KC_DB_USERNAME=${KC_DB_USERNAME}
-      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
-      - KC_DB_URL=${KC_DB_URL}
-      - KC_PROXY_HEADERS=xforwarded
-      - KC_HOSTNAME_STRICT=false
-      - KC_HTTP_ENABLED=true
-    networks:
-      vocab_net:
-        ipv4_address: 172.18.0.4
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r host: http://localhost\r Connection: close\r \r ' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-    command: [ "start", "--optimized" ]
-    # ---------------------------------------------
-
   backend:
     container_name: vocab-backend
     build: ../vocab-server/
@@ -43,18 +18,15 @@ services:
     #   - backend_vol:/app/logs:rw
     networks:
       vocab_net:
-        ipv4_address: 172.18.0.2
+        ipv4_address: 172.18.2.2
     ports:
       - "5000:8080"
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:8080/healthz || exit 1" ]
-      interval: 10s
+      interval: 5m
       timeout: 10s
       retries: 5
-      start_period: 10s
-    depends_on:
-      auth:
-        condition: service_healthy
+      start_period: 15s
     # ---------------------------------------------
 
     # frontend:
@@ -63,7 +35,7 @@ services:
     #   image: hello-world
     #   networks:
     #     vocab_net:
-    #       ipv4_address: 172.18.0.3
+    #       ipv4_address: 172.18.2.3
     #   ports:
     #     - "3000:3000"
     #   depends_on:
@@ -74,7 +46,7 @@ networks:
   vocab_net:
     ipam:
       config:
-        - subnet: 172.18.0.0/16
+        - subnet: 172.18.2.0/24
 
 # volumes:
 #   backend_vol:
